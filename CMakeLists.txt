@@ -9,8 +9,8 @@ if(NOT IDF_TARGET STREQUAL linux)
   add_compile_definitions(WIFI_PASSWORD="$ENV{WIFI_PASSWORD}")
 endif()
 
-if(NOT DEFINED ENV{OPENAI_API_KEY})
-  message(FATAL_ERROR "Env variable OPENAI_API_KEY must be set")
+if(NOT DEFINED ENV{OPENAI_API_KEY} OR NOT DEFINED ENV{GREETING} OR NOT DEFINED ENV{INSTRUCTIONS})
+  message(FATAL_ERROR "Env variable OPENAI_API_KEY, GREETING, INSTRUCTIONS must be set")
 endif()
 
 if(DEFINED ENV{LOG_DATACHANNEL_MESSAGES})
@@ -19,6 +19,8 @@ endif()
 
 add_compile_definitions(OPENAI_API_KEY="$ENV{OPENAI_API_KEY}")
 add_compile_definitions(OPENAI_REALTIMEAPI="https://api.openai.com/v1/realtime?model=gpt-4o-mini-realtime-preview-2024-12-17")
+add_compile_definitions(GREETING="$ENV{GREETING}")
+add_compile_definitions(INSTRUCTIONS="$ENV{INSTRUCTIONS}")
 
 set(COMPONENTS src)
 set(EXTRA_COMPONENT_DIRS "src" "components/srtp" "components/peer" "components/esp-libopus")

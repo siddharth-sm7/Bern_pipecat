@@ -10,9 +10,12 @@
 #include "main.h"
 
 #define TICK_INTERVAL 15
-#define GREETING                                                    \
+#define GREETING_JSON                                               \
   "{\"type\": \"response.create\", \"response\": {\"modalities\": " \
-  "[\"audio\", \"text\"], \"instructions\": \"Say 'How can I help?.'\"}}"
+  "[\"audio\", \"text\"], \"instructions\": \"Say '"GREETING"'\"}}"
+
+#define INSTRUCTION_JSON                                            \
+  "{\"type\": \"session.update\", \"session\": {\"instructions\": \"Say '"INSTRUCTIONS"'\"}}"
 
 PeerConnection *peer_connection = NULL;
 
@@ -40,8 +43,11 @@ static void oai_ondatachannel_onopen_task(void *userdata) {
                                          0, 0, (char *)"oai-events",
                                          (char *)"") != -1) {
     ESP_LOGI(LOG_TAG, "DataChannel created");
-    peer_connection_datachannel_send(peer_connection, (char *)GREETING,
-                                     strlen(GREETING));
+    peer_connection_datachannel_send(peer_connection, (char *)GREETING_JSON,
+                                     strlen(GREETING_JSON));
+    peer_connection_datachannel_send(peer_connection, (char *)INSTRUCTION_JSON,
+                                     strlen(INSTRUCTION_JSON));
+
   } else {
     ESP_LOGE(LOG_TAG, "Failed to create DataChannel");
   }

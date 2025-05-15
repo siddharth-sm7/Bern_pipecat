@@ -27,10 +27,12 @@ Call `set-target` with the platform you are targetting. Today only `linux` and `
 Configure device specific settings. None needed at this time
 * `idf.py menuconfig`
 
-Set your Wifi SSID + Password as env variables
+Set your the following env variables
 * `export WIFI_SSID=foo`
 * `export WIFI_PASSWORD=bar`
 * `export OPENAI_API_KEY=bing`
+* `export GREETING="Arr I am a pirate. Are you looking for my treasure?"`
+* `export INSTRUCTIONS="You are a pirate and only want to talk about pirate things."`
 
 Build
 * `idf.py build`
