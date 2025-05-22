@@ -1,5 +1,8 @@
 #include <driver/i2s.h>
 #include <opus.h>
+#include <cstring>
+#include <atomic>
+
 #include "esp_log.h"
 
 #include "main.h"
@@ -35,15 +38,22 @@ void convert_int32_to_int16_and_downsample(int32_t *in, int16_t *out, size_t cou
     }
 }
 
+std::atomic<bool> is_playing = false;
 void convert_16k8_to_32k32(int16_t *in_buf, size_t in_samples, int32_t *out_buf) {
-    size_t out_index = 0;
-    for (size_t i = 0; i < in_samples; i++) {
-        int32_t s = ((int32_t)in_buf[i]) << 16;
-        out_buf[out_index++] = s;
-        out_buf[out_index++] = s;
-        out_buf[out_index++] = s;
-        out_buf[out_index++] = s;
+  size_t out_index = 0;
+  bool any_set = false;
+  for (size_t i = 0; i < in_samples; i++) {
+    if (in_buf[i] != -1 && in_buf[i] != 0) {
+      any_set = true;
     }
+
+    int32_t s = ((int32_t)in_buf[i]) << 16;
+    out_buf[out_index++] = s;
+    out_buf[out_index++] = s;
+    out_buf[out_index++] = s;
+    out_buf[out_index++] = s;
+  }
+  is_playing = any_set;
 }
 
 static void i2s_driver_setup(i2s_mode_t mode, i2s_port_t i2s_num)
@@ -139,6 +149,10 @@ void oai_send_audio(PeerConnection *peer_connection) {
   esp_err_t ret = i2s_read(I2S_NUM_0, read_buffer, READ_BUFFER_SIZE, &bytes_read, portMAX_DELAY);
   if (ret != ESP_OK) {
     ESP_LOGE(TAG, "i2s_read failed: %s", esp_err_to_name(ret));
+  }
+
+  if (is_playing) {
+    memset(read_buffer, 0, bytes_read);
   }
 
   convert_int32_to_int16_and_downsample((int32_t *) &read_buffer, (int16_t*) &encode_resample_buffer, READ_BUFFER_SIZE / sizeof(uint32_t));
