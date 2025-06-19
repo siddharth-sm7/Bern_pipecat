@@ -20,13 +20,6 @@ has been developed against.
 You can get a ESP32S3 for much less money on eBay/AliExpress.
 
 ## Installation
-
-Call `set-target` with the platform you are targetting. Today only `linux` and `esp32s3` are supported.
-* `idf.py set-target esp32s3`
-
-Configure device specific settings. None needed at this time
-* `idf.py menuconfig`
-
 Set your the following env variables
 * `export WIFI_SSID=foo`
 * `export WIFI_PASSWORD=bar`
