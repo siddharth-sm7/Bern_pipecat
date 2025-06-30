@@ -27,7 +27,7 @@ static void pipecat_event_handler(void *arg, esp_event_base_t event_base,
   }
 }
 
-void pipecat_wifi(void) {
+void pipecat_init_wifi() {
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
                                              &pipecat_event_handler, NULL));
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,

@@ -1,5 +1,5 @@
 #ifndef LINUX_BUILD
-#include <driver/i2s.h>
+#include <driver/i2s_std.h>
 #include <opus.h>
 #endif
 
@@ -8,8 +8,6 @@
 #include <string.h>
 
 #include "main.h"
-
-#define TICK_INTERVAL 15
 
 PeerConnection *peer_connection = NULL;
 
@@ -30,6 +28,7 @@ static void pipecat_ondatachannel_onmessage_task(char *msg, size_t len,
 #ifdef LOG_DATACHANNEL_MESSAGES
   ESP_LOGI(LOG_TAG, "DataChannel Message: %s", msg);
 #endif
+  pipecat_screen_add_log(msg, &STYLE_BLUE);
 }
 
 static void pipecat_ondatachannel_onopen_task(void *userdata) {
@@ -76,7 +75,7 @@ static void pipecat_on_icecandidate_task(char *description, void *user_data) {
   free(local_buffer);
 }
 
-void pipecat_webrtc() {
+void pipecat_init_webrtc() {
   PeerConfiguration peer_connection_config = {
       .ice_servers = {},
       .audio_codec = CODEC_OPUS,
@@ -108,9 +107,8 @@ void pipecat_webrtc() {
                                 pipecat_ondatachannel_onopen_task, NULL);
 
   peer_connection_create_offer(peer_connection);
+}
 
-  while (1) {
-    peer_connection_loop(peer_connection);
-    vTaskDelay(pdMS_TO_TICKS(TICK_INTERVAL));
-  }
+void pipecat_webrtc_loop() {
+  peer_connection_loop(peer_connection);
 }
