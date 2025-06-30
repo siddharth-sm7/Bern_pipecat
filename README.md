@@ -81,3 +81,9 @@ where `/dev/ttyACM0` is the device where your ESP32 is connected. You can run
 
 On Debian systems, you will want to add your user to the `dialout` group so you
 don't need root access.
+
+### macOS
+
+```
+idf.py flash`
+```
