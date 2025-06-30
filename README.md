@@ -1,41 +1,83 @@
-# Open RealtimeAPI Embedded SDK
+# Pipecat ESP32 Client SDK
 
-# Table of Contents
+## 💻 Platform/Device Support
 
-- [Docs](#docs)
-- [Installation](#installation)
-- [Usage](#usage)
+This SDK has been developed and tested on a `esp32s3` and `linux`. You don't
+need any physical hardware to run this SDK, but it will be very limited
+(e.g. you won't hear an audio on Linux).
 
-## Platform/Device Support
-
-This SDK has been developed tested on a `esp32s3` and `linux`. You don't need any physical hardware
-to run this SDK. You can use it from Linux directly.
-
-To use it on hardware purchase either of these microcontrollers. Others may work, but this is what
-has been developed against.
+To use it on hardware purchase either of these microcontrollers. Others may
+work, but this is what has been developed against.
 
 * [Freenove ESP32-S3-WROOM](https://www.amazon.com/gp/product/B0BMQ8F7FN)
 * [Sonatino - ESP32-S3 Audio Development Board](https://www.amazon.com/gp/product/B0BVY8RJNP)
+* [Espressif - ESP32-S3-BOX-3](https://www.digikey.com/short/fb2vjrpn)
 
-You can get a ESP32S3 for much less money on eBay/AliExpress.
+## 📋 Pre-requisites
 
-## Installation
-Set your the following env variables
-* `export WIFI_SSID=foo`
-* `export WIFI_PASSWORD=bar`
-* `export OPENAI_API_KEY=bing`
-* `export GREETING="Arr I am a pirate. Are you looking for my treasure?"`
-* `export INSTRUCTIONS="You are a pirate and only want to talk about pirate things."`
+Clone this repository:
 
-Build
-* `idf.py build`
+```
+git clone --recursive https://github.com/pipecat-ai/pipecat-esp32.git
+```
 
-If you built for `esp32s3` run the following to flash to the device
-* `sudo -E idf.py flash`
+Install the ESP-IDF toolchain following these
+[instructions](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html).
 
-If you built for `linux` you can run the binary directly
-* `./build/src.elf`
+After that, just open a terminal and load ESP-IDF tools:
 
-See [build.yaml](.github/workflows/build.yaml) for a Docker command to do this all in one step.
+```
+source PATH_TO_ESP_IDF/export.sh
+```
 
-## Usage
+We also need to set a few environment variables before we can build:
+
+```
+export WIFI_SSID=foo
+export WIFI_PASSWORD=bar
+export PIPECAT_SMALLWEBRTC_URL=URL (e.g. http://192.168.1.10:7860/api/offer)
+```
+
+where `WIFI_SSID` and `WIFI_PASSWORD` are just needed to connect the device to
+the network. `PIPECAT_SMALLWEBRTC_URL` is the URL endpoint to connect to your
+Pipecat bot.
+
+## 🛠️ Build
+
+Go inside the `esp32-s3-box-3` directory.
+
+The first thing to do is to set the desired target, for example:
+
+```
+idf.py --preview set-target esp32s3
+```
+
+You can also set `linux` instead of `esp32s3`.
+
+Then, just build:
+
+```
+idf.py build
+```
+
+If you built for `linux` you can run the binary directly:
+
+```
+./build/src.elf
+```
+
+## 🔌 Flash the device
+
+If you built for `esp32s3` you can flash your device using the following commands:
+
+### Linux
+
+```
+idf.py -p /dev/ttyACM0 flash`
+```
+
+where `/dev/ttyACM0` is the device where your ESP32 is connected. You can run
+`sudo dmesg` to know the device on your system.
+
+On Debian systems, you will want to add your user to the `dialout` group so you
+don't need root access.
