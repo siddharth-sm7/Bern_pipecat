@@ -11,7 +11,7 @@
 static bool g_wifi_connected = false;
 
 static void pipecat_event_handler(void *arg, esp_event_base_t event_base,
-                              int32_t event_id, void *event_data) {
+                                  int32_t event_id, void *event_data) {
   static int s_retry_num = 0;
   if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
     if (s_retry_num < 5) {

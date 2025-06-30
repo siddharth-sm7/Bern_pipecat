@@ -24,7 +24,7 @@ void pipecat_send_audio_task(void *user_data) {
 #endif
 
 static void pipecat_ondatachannel_onmessage_task(char *msg, size_t len,
-                                             void *userdata, uint16_t sid) {
+                                                 void *userdata, uint16_t sid) {
 #ifdef LOG_DATACHANNEL_MESSAGES
   ESP_LOGI(LOG_TAG, "DataChannel Message: %s", msg);
 #endif
@@ -48,7 +48,7 @@ static void pipecat_ondatachannel_onopen_task(void *userdata) {
 }
 
 static void pipecat_onconnectionstatechange_task(PeerConnectionState state,
-                                             void *user_data) {
+                                                 void *user_data) {
   ESP_LOGI(LOG_TAG, "PeerConnectionState: %s",
            peer_connection_state_to_string(state));
 
@@ -61,8 +61,9 @@ static void pipecat_onconnectionstatechange_task(PeerConnectionState state,
 #ifndef LINUX_BUILD
     StackType_t *stack_memory = (StackType_t *)heap_caps_malloc(
         30000 * sizeof(StackType_t), MALLOC_CAP_SPIRAM);
-    xTaskCreateStaticPinnedToCore(pipecat_send_audio_task, "audio_publisher", 30000,
-                                  NULL, 7, stack_memory, &task_buffer, 0);
+    xTaskCreateStaticPinnedToCore(pipecat_send_audio_task, "audio_publisher",
+                                  30000, NULL, 7, stack_memory, &task_buffer,
+                                  0);
 #endif
   }
 }
@@ -71,7 +72,8 @@ static void pipecat_on_icecandidate_task(char *description, void *user_data) {
   char *local_buffer = (char *)malloc(MAX_HTTP_OUTPUT_BUFFER + 1);
   memset(local_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
   pipecat_http_request(description, local_buffer);
-  peer_connection_set_remote_description(peer_connection, local_buffer, SDP_TYPE_ANSWER);
+  peer_connection_set_remote_description(peer_connection, local_buffer,
+                                         SDP_TYPE_ANSWER);
   free(local_buffer);
 }
 
@@ -99,8 +101,8 @@ void pipecat_init_webrtc() {
 #endif
   }
 
-  peer_connection_oniceconnectionstatechange(peer_connection,
-                                             pipecat_onconnectionstatechange_task);
+  peer_connection_oniceconnectionstatechange(
+      peer_connection, pipecat_onconnectionstatechange_task);
   peer_connection_onicecandidate(peer_connection, pipecat_on_icecandidate_task);
   peer_connection_ondatachannel(peer_connection,
                                 pipecat_ondatachannel_onmessage_task,
