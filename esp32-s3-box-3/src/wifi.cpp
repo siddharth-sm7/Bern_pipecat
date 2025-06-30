@@ -10,7 +10,7 @@
 
 static bool g_wifi_connected = false;
 
-static void oai_event_handler(void *arg, esp_event_base_t event_base,
+static void pipecat_event_handler(void *arg, esp_event_base_t event_base,
                               int32_t event_id, void *event_data) {
   static int s_retry_num = 0;
   if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
@@ -27,11 +27,11 @@ static void oai_event_handler(void *arg, esp_event_base_t event_base,
   }
 }
 
-void oai_wifi(void) {
+void pipecat_wifi(void) {
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
-                                             &oai_event_handler, NULL));
+                                             &pipecat_event_handler, NULL));
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
-                                             &oai_event_handler, NULL));
+                                             &pipecat_event_handler, NULL));
 
   ESP_ERROR_CHECK(esp_netif_init());
   esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();

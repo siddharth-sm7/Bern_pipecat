@@ -9,7 +9,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-esp_err_t oai_http_event_handler(esp_http_client_event_t *evt) {
+static esp_err_t http_event_handler(esp_http_client_event_t *evt) {
   static int output_len;
   switch (evt->event_id) {
     case HTTP_EVENT_REDIRECT:
@@ -70,12 +70,12 @@ esp_err_t oai_http_event_handler(esp_http_client_event_t *evt) {
   return ESP_OK;
 }
 
-void oai_http_request(char *offer, char *answer) {
+void pipecat_http_request(char *offer, char *answer) {
   esp_http_client_config_t config;
   memset(&config, 0, sizeof(esp_http_client_config_t));
 
   config.url = PIPECAT_SMALLWEBRTC_URL;
-  config.event_handler = oai_http_event_handler;
+  config.event_handler = http_event_handler;
   config.timeout_ms = HTTP_TIMEOUT_MS;
   config.user_data = answer;
 

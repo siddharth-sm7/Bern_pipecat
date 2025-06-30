@@ -15,8 +15,6 @@
 #define OPUS_ENCODER_BITRATE 30000
 #define OPUS_ENCODER_COMPLEXITY 0
 
-static const char *TAG = "oai_media";
-
 std::atomic<bool> is_playing = false;
 void set_is_playing(int16_t *in_buf, size_t in_samples) {
   bool any_set = false;
@@ -31,7 +29,7 @@ void set_is_playing(int16_t *in_buf, size_t in_samples) {
 esp_codec_dev_handle_t mic_codec_dev = NULL;
 esp_codec_dev_handle_t spk_codec_dev = NULL;
 
-void oai_init_audio_capture() {
+void pipecat_init_audio_capture() {
   mic_codec_dev = bsp_audio_codec_microphone_init();
   spk_codec_dev = bsp_audio_codec_speaker_init();
 
@@ -50,7 +48,7 @@ void oai_init_audio_capture() {
 opus_int16 *decoder_buffer = NULL;
 OpusDecoder *opus_decoder = NULL;
 
-void oai_init_audio_decoder() {
+void pipecat_init_audio_decoder() {
   int decoder_error = 0;
   opus_decoder = opus_decoder_create(SAMPLE_RATE, 1, &decoder_error);
   if (decoder_error != OPUS_OK) {
@@ -61,7 +59,7 @@ void oai_init_audio_decoder() {
   decoder_buffer = (opus_int16 *)malloc(PCM_BUFFER_SIZE);
 }
 
-void oai_audio_decode(uint8_t *data, size_t size) {
+void pipecat_audio_decode(uint8_t *data, size_t size) {
   esp_err_t ret;
   int decoded_size =
       opus_decode(opus_decoder, data, size, decoder_buffer, PCM_BUFFER_SIZE, 0);
@@ -71,7 +69,7 @@ void oai_audio_decode(uint8_t *data, size_t size) {
     if ((ret = esp_codec_dev_write(spk_codec_dev, decoder_buffer,
                                    decoded_size * sizeof(uint16_t))) !=
         ESP_OK) {
-      ESP_LOGE(TAG, "esp_codec_dev_write failed: %s", esp_err_to_name(ret));
+      ESP_LOGE(LOG_TAG, "esp_codec_dev_write failed: %s", esp_err_to_name(ret));
     }
   }
 }
@@ -80,7 +78,7 @@ OpusEncoder *opus_encoder = NULL;
 uint8_t *encoder_output_buffer = NULL;
 uint8_t *read_buffer = NULL;
 
-void oai_init_audio_encoder() {
+void pipecat_init_audio_encoder() {
   int encoder_error;
   opus_encoder = opus_encoder_create(SAMPLE_RATE, 1, OPUS_APPLICATION_VOIP,
                                      &encoder_error);
@@ -104,7 +102,7 @@ void oai_init_audio_encoder() {
   encoder_output_buffer = (uint8_t *)malloc(OPUS_BUFFER_SIZE);
 }
 
-void oai_send_audio(PeerConnection *peer_connection) {
+void pipecat_send_audio(PeerConnection *peer_connection) {
   if (esp_codec_dev_read(mic_codec_dev, read_buffer, PCM_BUFFER_SIZE) !=
       ESP_OK) {
     printf("esp_codec_dev_read failed");

@@ -15,26 +15,26 @@ PeerConnection *peer_connection = NULL;
 
 #ifndef LINUX_BUILD
 StaticTask_t task_buffer;
-void oai_send_audio_task(void *user_data) {
-  oai_init_audio_encoder();
+void pipecat_send_audio_task(void *user_data) {
+  pipecat_init_audio_encoder();
 
   while (1) {
-    oai_send_audio(peer_connection);
+    pipecat_send_audio(peer_connection);
     vTaskDelay(pdMS_TO_TICKS(TICK_INTERVAL));
   }
 }
 #endif
 
-static void oai_ondatachannel_onmessage_task(char *msg, size_t len,
+static void pipecat_ondatachannel_onmessage_task(char *msg, size_t len,
                                              void *userdata, uint16_t sid) {
 #ifdef LOG_DATACHANNEL_MESSAGES
   ESP_LOGI(LOG_TAG, "DataChannel Message: %s", msg);
 #endif
 }
 
-static void oai_ondatachannel_onopen_task(void *userdata) {
+static void pipecat_ondatachannel_onopen_task(void *userdata) {
   if (peer_connection_create_datachannel(peer_connection, DATA_CHANNEL_RELIABLE,
-                                         0, 0, (char *)"oai-events",
+                                         0, 0, (char *)"rtvi-ai",
                                          (char *)"") != -1) {
     ESP_LOGI(LOG_TAG, "DataChannel created");
     // peer_connection_datachannel_send(peer_connection, (char *)GREETING_JSON,
@@ -48,7 +48,7 @@ static void oai_ondatachannel_onopen_task(void *userdata) {
   }
 }
 
-static void oai_onconnectionstatechange_task(PeerConnectionState state,
+static void pipecat_onconnectionstatechange_task(PeerConnectionState state,
                                              void *user_data) {
   ESP_LOGI(LOG_TAG, "PeerConnectionState: %s",
            peer_connection_state_to_string(state));
@@ -62,21 +62,21 @@ static void oai_onconnectionstatechange_task(PeerConnectionState state,
 #ifndef LINUX_BUILD
     StackType_t *stack_memory = (StackType_t *)heap_caps_malloc(
         30000 * sizeof(StackType_t), MALLOC_CAP_SPIRAM);
-    xTaskCreateStaticPinnedToCore(oai_send_audio_task, "audio_publisher", 30000,
+    xTaskCreateStaticPinnedToCore(pipecat_send_audio_task, "audio_publisher", 30000,
                                   NULL, 7, stack_memory, &task_buffer, 0);
 #endif
   }
 }
 
-static void oai_on_icecandidate_task(char *description, void *user_data) {
+static void pipecat_on_icecandidate_task(char *description, void *user_data) {
   char *local_buffer = (char *)malloc(MAX_HTTP_OUTPUT_BUFFER + 1);
   memset(local_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
-  oai_http_request(description, local_buffer);
+  pipecat_http_request(description, local_buffer);
   peer_connection_set_remote_description(peer_connection, local_buffer);
   free(local_buffer);
 }
 
-void oai_webrtc() {
+void pipecat_webrtc() {
   PeerConfiguration peer_connection_config = {
       .ice_servers = {},
       .audio_codec = CODEC_OPUS,
@@ -84,7 +84,7 @@ void oai_webrtc() {
       .datachannel = DATA_CHANNEL_STRING,
       .onaudiotrack = [](uint8_t *data, size_t size, void *userdata) -> void {
 #ifndef LINUX_BUILD
-        oai_audio_decode(data, size);
+        pipecat_audio_decode(data, size);
 #endif
       },
       .onvideotrack = NULL,
@@ -101,11 +101,11 @@ void oai_webrtc() {
   }
 
   peer_connection_oniceconnectionstatechange(peer_connection,
-                                             oai_onconnectionstatechange_task);
-  peer_connection_onicecandidate(peer_connection, oai_on_icecandidate_task);
+                                             pipecat_onconnectionstatechange_task);
+  peer_connection_onicecandidate(peer_connection, pipecat_on_icecandidate_task);
   peer_connection_ondatachannel(peer_connection,
-                                oai_ondatachannel_onmessage_task,
-                                oai_ondatachannel_onopen_task, NULL);
+                                pipecat_ondatachannel_onmessage_task,
+                                pipecat_ondatachannel_onopen_task, NULL);
 
   peer_connection_create_offer(peer_connection);
 
