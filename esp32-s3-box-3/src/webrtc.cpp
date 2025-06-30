@@ -71,7 +71,7 @@ static void pipecat_on_icecandidate_task(char *description, void *user_data) {
   char *local_buffer = (char *)malloc(MAX_HTTP_OUTPUT_BUFFER + 1);
   memset(local_buffer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
   pipecat_http_request(description, local_buffer);
-  peer_connection_set_remote_description(peer_connection, local_buffer);
+  peer_connection_set_remote_description(peer_connection, local_buffer, SDP_TYPE_ANSWER);
   free(local_buffer);
 }
 
