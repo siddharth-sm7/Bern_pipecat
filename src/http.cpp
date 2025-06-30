@@ -1,3 +1,4 @@
+#include <cJSON.h>
 #include <esp_http_client.h>
 #include <esp_log.h>
 #include <string.h>
@@ -73,25 +74,72 @@ void oai_http_request(char *offer, char *answer) {
   esp_http_client_config_t config;
   memset(&config, 0, sizeof(esp_http_client_config_t));
 
-  config.url = OPENAI_REALTIMEAPI;
+  config.url = PIPECAT_SMALLWEBRTC_URL;
   config.event_handler = oai_http_event_handler;
+  config.timeout_ms = HTTP_TIMEOUT_MS;
   config.user_data = answer;
 
-  snprintf(answer, MAX_HTTP_OUTPUT_BUFFER, "Bearer %s", OPENAI_API_KEY);
+  ESP_LOGI(LOG_TAG, "Connecting to %s", config.url);
+
+  cJSON *j_offer = cJSON_CreateObject();
+  if (j_offer == NULL) {
+    ESP_LOGE(LOG_TAG, "Unable to create JSON offer");
+    return;
+  }
+  if (cJSON_AddStringToObject(j_offer, "sdp", offer) == NULL) {
+    cJSON_Delete(j_offer);
+    ESP_LOGE(LOG_TAG, "Unable to create JSON offer");
+    return;
+  }
+  if (cJSON_AddStringToObject(j_offer, "type", "offer") == NULL) {
+    cJSON_Delete(j_offer);
+    ESP_LOGE(LOG_TAG, "Unable to create JSON offer");
+    return;
+  }
+
+  ESP_LOGD(LOG_TAG, "OFFER\n%s", offer);
+
+  char *j_offer_str = cJSON_Print(j_offer);
+
+  cJSON_Delete(j_offer);
 
   esp_http_client_handle_t client = esp_http_client_init(&config);
   esp_http_client_set_method(client, HTTP_METHOD_POST);
-  esp_http_client_set_header(client, "Content-Type", "application/sdp");
-  esp_http_client_set_header(client, "Authorization", answer);
-  esp_http_client_set_post_field(client, offer, strlen(offer));
+  esp_http_client_set_header(client, "Content-Type", "application/json");
+  esp_http_client_set_post_field(client, j_offer_str, strlen(j_offer_str));
 
   esp_err_t err = esp_http_client_perform(client);
-  if (err != ESP_OK || esp_http_client_get_status_code(client) != 201) {
-    ESP_LOGE(LOG_TAG, "Error perform http request %s", esp_err_to_name(err));
+  int status_code = esp_http_client_get_status_code(client);
+  if (err != ESP_OK || status_code != 200) {
+    ESP_LOGE(LOG_TAG, "Error perform http request %s (status %d)",
+             esp_err_to_name(err), status_code);
 #ifndef LINUX_BUILD
     esp_restart();
 #endif
   }
+
+  cJSON *j_response = cJSON_Parse((const char *)answer);
+  if (j_response == NULL) {
+    ESP_LOGE(LOG_TAG, "Error perform http request");
+#ifndef LINUX_BUILD
+    esp_restart();
+#endif
+  }
+
+  cJSON *j_answer = cJSON_GetObjectItem(j_response, "sdp");
+  if (j_answer == NULL) {
+    ESP_LOGE(LOG_TAG, "Error perform http request");
+#ifndef LINUX_BUILD
+    esp_restart();
+#endif
+  }
+
+  memset(answer, 0, MAX_HTTP_OUTPUT_BUFFER + 1);
+  memcpy(answer, j_answer->valuestring, strlen(j_answer->valuestring));
+
+  ESP_LOGD(LOG_TAG, "ANSWER\n%s", answer);
+
+  cJSON_free(j_response);
 
   esp_http_client_cleanup(client);
 }
