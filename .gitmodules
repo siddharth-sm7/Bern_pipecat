@@ -1,12 +1,12 @@
-[submodule "components/srtp"]
-	path = components/srtp
+[submodule "esp32-s3-box-3/components/srtp"]
+	path = esp32-s3-box-3/components/srtp
 	url = https://git@github.com/sepfy/esp_ports
-[submodule "deps/libpeer"]
-	path = deps/libpeer
+[submodule "esp32-s3-box-3/deps/libpeer"]
+	path = esp32-s3-box-3/deps/libpeer
 	url = https://github.com/sepfy/libpeer.git
-[submodule "components/esp-libopus"]
-	path = components/esp-libopus
+[submodule "esp32-s3-box-3/components/esp-libopus"]
+	path = esp32-s3-box-3/components/esp-libopus
 	url = https://github.com/XasWorks/esp-libopus.git
-[submodule "components/esp-protocols"]
-	path = components/esp-protocols
+[submodule "esp32-s3-box-3/components/esp-protocols"]
+	path = esp32-s3-box-3/components/esp-protocols
 	url = https://github.com/espressif/esp-protocols.git

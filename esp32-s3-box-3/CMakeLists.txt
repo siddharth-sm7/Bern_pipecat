@@ -20,14 +20,14 @@ endif()
 add_compile_definitions(PIPECAT_SMALLWEBRTC_URL="$ENV{PIPECAT_SMALLWEBRTC_URL}")
 
 set(COMPONENTS src)
-set(EXTRA_COMPONENT_DIRS "src" "../components/srtp" "../components/peer" "../components/esp-libopus")
+set(EXTRA_COMPONENT_DIRS "src" "components/srtp" "components/peer" "components/esp-libopus")
 
 if(IDF_TARGET STREQUAL linux)
   add_compile_definitions(LINUX_BUILD=1)
   list(APPEND EXTRA_COMPONENT_DIRS
     $ENV{IDF_PATH}/examples/protocols/linux_stubs/esp_stubs
-    "../components/esp-protocols/common_components/linux_compat/esp_timer"
-    "../components/esp-protocols/common_components/linux_compat/freertos"
+    "components/esp-protocols/common_components/linux_compat/esp_timer"
+    "components/esp-protocols/common_components/linux_compat/freertos"
     )
 endif()
 
