@@ -28,7 +28,6 @@ extern "C" void app_main(void) {
 
   while (1) {
     pipecat_webrtc_loop();
-    pipecat_screen_loop();
     vTaskDelay(pdMS_TO_TICKS(TICK_INTERVAL));
   }
 }

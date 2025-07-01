@@ -120,7 +120,7 @@ void pipecat_http_request(char *offer, char *answer) {
 
   cJSON *j_response = cJSON_Parse((const char *)answer);
   if (j_response == NULL) {
-    ESP_LOGE(LOG_TAG, "Error perform http request");
+    ESP_LOGE(LOG_TAG, "Error parsing HTTP response");
 #ifndef LINUX_BUILD
     esp_restart();
 #endif
@@ -128,7 +128,7 @@ void pipecat_http_request(char *offer, char *answer) {
 
   cJSON *j_answer = cJSON_GetObjectItem(j_response, "sdp");
   if (j_answer == NULL) {
-    ESP_LOGE(LOG_TAG, "Error perform http request");
+    ESP_LOGE(LOG_TAG, "Unable to find `sdp` field in response");
 #ifndef LINUX_BUILD
     esp_restart();
 #endif
@@ -139,7 +139,7 @@ void pipecat_http_request(char *offer, char *answer) {
 
   ESP_LOGD(LOG_TAG, "ANSWER\n%s", answer);
 
-  cJSON_free(j_response);
+  cJSON_Delete(j_response);
 
   esp_http_client_cleanup(client);
 }

@@ -9,7 +9,7 @@
 
 #include "main.h"
 
-PeerConnection *peer_connection = NULL;
+static PeerConnection *peer_connection = NULL;
 
 #ifndef LINUX_BUILD
 StaticTask_t task_buffer;
@@ -28,6 +28,7 @@ static void pipecat_ondatachannel_onmessage_task(char *msg, size_t len,
 #ifdef LOG_DATACHANNEL_MESSAGES
   ESP_LOGI(LOG_TAG, "DataChannel Message: %s", msg);
 #endif
+  pipecat_rtvi_handle_message(msg);
 }
 
 static void pipecat_ondatachannel_onopen_task(void *userdata) {
@@ -35,12 +36,6 @@ static void pipecat_ondatachannel_onopen_task(void *userdata) {
                                          0, 0, (char *)"rtvi-ai",
                                          (char *)"") != -1) {
     ESP_LOGI(LOG_TAG, "DataChannel created");
-    // peer_connection_datachannel_send(peer_connection, (char *)GREETING_JSON,
-    //                                  strlen(GREETING_JSON));
-    // peer_connection_datachannel_send(peer_connection, (char
-    // *)INSTRUCTION_JSON,
-    //                                  strlen(INSTRUCTION_JSON));
-
   } else {
     ESP_LOGE(LOG_TAG, "Failed to create DataChannel");
   }
@@ -63,6 +58,7 @@ static void pipecat_onconnectionstatechange_task(PeerConnectionState state,
     xTaskCreateStaticPinnedToCore(pipecat_send_audio_task, "audio_publisher",
                                   30000, NULL, 7, stack_memory, &task_buffer,
                                   0);
+    pipecat_init_rtvi(peer_connection, &pipecat_rtvi_callbacks);
 #endif
   }
 }
