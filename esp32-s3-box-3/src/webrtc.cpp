@@ -28,7 +28,6 @@ static void pipecat_ondatachannel_onmessage_task(char *msg, size_t len,
 #ifdef LOG_DATACHANNEL_MESSAGES
   ESP_LOGI(LOG_TAG, "DataChannel Message: %s", msg);
 #endif
-  pipecat_screen_add_log(msg, &STYLE_BLUE);
 }
 
 static void pipecat_ondatachannel_onopen_task(void *userdata) {
