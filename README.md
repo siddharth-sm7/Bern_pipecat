@@ -87,3 +87,15 @@ don't need root access.
 ```
 idf.py flash`
 ```
+
+## ▶️ Usage
+
+Currently, you can try `pipecat-esp32` with one of the Pipecat foundational
+examples. For example, from the Pipecat repository you can run:
+
+```
+python examples/foundational/07-interruptible.py --host IP --esp32
+```
+
+where `IP` is just your machine IP address (e.g. 192.168.1.10). Then, you would
+set the environment variable `PIPECAT_SMALLWEBRTC_URL` as explained above.
