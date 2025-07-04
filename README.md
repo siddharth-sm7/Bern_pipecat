@@ -73,7 +73,7 @@ If you built for `esp32s3` you can flash your device using the following command
 ### Linux
 
 ```
-idf.py -p /dev/ttyACM0 flash`
+idf.py -p /dev/ttyACM0 flash
 ```
 
 where `/dev/ttyACM0` is the device where your ESP32 is connected. You can run
@@ -85,7 +85,7 @@ don't need root access.
 ### macOS
 
 ```
-idf.py flash`
+idf.py flash
 ```
 
 ## ▶️ Usage
