@@ -13,11 +13,15 @@
 #include "esp_heap_caps.h"
 #include "main.h"
 
-#define SAMPLE_RATE (16000)
+#define GAIN 0.5f  // Changed from 10.0 to 10.0f for proper float type
 
-#define OPUS_BUFFER_SIZE 1276  // 1276 bytes is recommended by opus_encode
+#define CHANNELS 1
+#define SAMPLE_RATE (16000)
+#define BITS_PER_SAMPLE 16
+
 #define PCM_BUFFER_SIZE 640
 
+#define OPUS_BUFFER_SIZE 1276
 #define OPUS_ENCODER_BITRATE 30000
 #define OPUS_ENCODER_COMPLEXITY 0
 
@@ -67,18 +71,16 @@ void pipecat_init_audio_decoder() {
   decoder_buffer = (opus_int16 *)malloc(PCM_BUFFER_SIZE);
 }
 
+// Replaced double_volume with high-quality gain application from Code 2
 void double_volume(int16_t *samples, size_t num_samples) {
     for (size_t i = 0; i < num_samples; i++) {
-        int32_t amplified = (int32_t)samples[i] * 2;
+        float scaled = (float)samples[i] * GAIN;
 
-        // Clamp to 16-bit range
-        if (amplified > INT16_MAX) {
-            amplified = INT16_MAX;
-        } else if (amplified < INT16_MIN) {
-            amplified = INT16_MIN;
-        }
+        // Clamp to 16-bit range (proper floating-point comparison)
+        if (scaled > 32767.0f) scaled = 32767.0f;
+        if (scaled < -32768.0f) scaled = -32768.0f;
 
-        samples[i] = (int16_t)amplified;
+        samples[i] = (int16_t)scaled;
     }
 }
 
