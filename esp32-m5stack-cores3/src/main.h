@@ -1,4 +1,13 @@
 #include <peer.h>
+#include <peer.h>
+
+// Add BSP support
+#ifdef CONFIG_BSP_BOARD_M5STACK_CORE_S3
+#include "bsp/esp-bsp.h"
+#else
+#include <M5Unified.h>
+#endif
+
 
 #ifndef LINUX_BUILD
 #include <M5Unified.h>
